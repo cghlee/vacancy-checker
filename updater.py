@@ -6,17 +6,11 @@
 
 import requests, bs4, json
 
-def update_civil_service():
+def update_civil_service(urls: dict):
     # Pulls a Civil Service jobs URL and converts into a BS4 object
-    URL_CIVIL_SERVICE = 'https://www.civilservicejobs.service.gov.uk/csr/'\
-                        'index.cgi?SID=cGFnZWFjdGlvbj1zZWFyY2hjb250ZXh0Jn'\
-                        'BhZ2VjbGFzcz1TZWFyY2gmcGFnZT0xJm93bmVyPTUwNzAwMD'\
-                        'Amb3duZXJ0eXBlPWZhaXImY29udGV4dGlkPTQ3ODYzMTIyJn'\
-                        'JlcXNpZz0xNjkzMzAyMjYzLWQ3N2FkMjU5Zjc0YTBiN2Q5MT'\
-                        'g1NDBiZjBkMzliMTM4MzM4OGFjNjM%3D&sort=sallow&req'\
-                        'sig=1693302263-d77ad259f74a0b7d918540bf0d39b1383388ac63'
+    url_civil = urls['civil_service']
     try:
-        initial_page = requests.get(URL_CIVIL_SERVICE)
+        initial_page = requests.get(url_civil)
         initial_page.raise_for_status()
     except requests.exceptions.HTTPError as err:
         print('Error: %s' % str(err))
@@ -28,12 +22,19 @@ def update_civil_service():
     # Assign variable with total results
     results_element = initial_soup.find('div', 'csr-page-title').getText()
     total_results = results_element.split()[0]
+
     # Calculate expected number of pages of results (25 per page)
-    # If URL is invalid, raised ValueError will terminate the program
+    # If URL is invalid, raised ValueError will ask for new URLterminate the program
     try:
         expected_pages = int(total_results) // 25
     except ValueError:
-        print('Invalid or expired URL\nPlease update the URL')
+        new_url = input('Invalid/expired URL - please input an updated URL:\n')
+        urls['civil_service'] = new_url
+        with open('urls.json', 'w') as file:
+            json_urls = json.dumps(urls)
+            file.write(json_urls)
+            file.close()
+        print('Civil Service Jobs URL updated\nPlease run again for updates')
         quit()
 
     # Grab HTML elements for the paging menu
@@ -42,7 +43,7 @@ def update_civil_service():
 
     # Add results pages into a list for processing of individual vacancies
     pages = []
-    pages.append(URL_CIVIL_SERVICE)
+    pages.append(url_civil)
     for i in range(expected_pages):
         pages.append(page_elements[i].get('href'))
 

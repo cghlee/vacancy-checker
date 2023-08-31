@@ -7,6 +7,21 @@
 from updater import update_civil_service
 import os, json, webbrowser
 
+# If previously run, import contents of existing JSON file containing URLs
+if os.path.exists('urls.json'):
+    with open('urls.json', 'r') as file:
+        urls = json.load(file)
+        file.close()
+# If not previously run, generate a JSON file containing specified URLs
+else:
+    urls = {}
+    url_civil = input('Please input URL for Civil Service Jobs vacancies:\n')
+    urls['civil_service'] = url_civil
+    with open('urls.json', 'w') as file:
+        json_urls = json.dumps(urls)
+        file.write(json_urls)
+        file.close()
+
 # If previously run, import contents of existing JSON file containing vacancies
 if os.path.exists('vacancies.json'):
     with open('vacancies.json', 'r') as file:
@@ -16,12 +31,12 @@ if os.path.exists('vacancies.json'):
 else:
     print('JSON file of job vacancies not found')
     print('Generating new JSON file containing current job vacancies')
-    update_civil_service()
+    update_civil_service(urls)
     print('Generated new JSON file\nPlease run again for updates to vacancies')
     quit()
 
 # Update vacancies and create dictionary to store updated vacancy information
-update_civil_service()
+update_civil_service(urls)
 with open('vacancies.json', 'r') as file:
     updated_vacancies = json.load(file)
     file.close()
