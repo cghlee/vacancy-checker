@@ -10,13 +10,13 @@ Civil Service Jobs website.
 Vacancy Checker requires the `Requests` and `BeautifulSoup4` modules, with
 relevant documentation linked below:
 
-- [Requests module](https://pypi.org/project/requests/)
-- [BeautifulSoup4 module](https://pypi.org/project/beautifulsoup4/)
+- [Requests](https://pypi.org/project/requests/)
+- [BeautifulSoup4](https://pypi.org/project/beautifulsoup4/)
 
 ## How to Use
 
-Run `vacancy_checker.py`, which will call the `update_civil_service` function
-within `updater.py`.
+Run `vacancy_checker.py`, which will operate according to functions defined
+within `functions_urls.py` and `functions_vacancies.py`.
 
 If locally-stored `vacancies.json` or `urls.json` files do not exist, they
 will be automatically generated using current vacancy listings, or user-
@@ -28,4 +28,4 @@ New vacancies, if present, will be listed alongside a prompt for them to all
 be opened within your default browser.
 
 If a job vacancy website URL is identified as invalid or expired, you will be
-prompted to update the URL; after which you must rerun `vacancy_checker.py`.
+prompted to update the URL.

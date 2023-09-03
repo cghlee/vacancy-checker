@@ -4,23 +4,15 @@
 # vacancy_checker.py - Checks existing vacancies, updates and compares against
 # new vacancies, then provides option to open new vacancies within a browser
 
-from updater import update_civil_service
+from functions_vacancies import update_civil_service
+from functions_urls import url_importer, url_checker
 import os, json, webbrowser
 
-# If previously run, import contents of existing JSON file containing URLs
-if os.path.exists('urls.json'):
-    with open('urls.json', 'r') as file:
-        urls = json.load(file)
-        file.close()
-# If not previously run, generate a JSON file containing specified URLs
-else:
-    urls = {}
-    url_civil = input('Please input URL for Civil Service Jobs vacancies:\n')
-    urls['civil_service'] = url_civil
-    with open('urls.json', 'w') as file:
-        json_urls = json.dumps(urls)
-        file.write(json_urls)
-        file.close()
+# Import or generate job vacancy URLs via url_importer function
+urls = url_importer()
+
+# Check job vacancy URLs are functioning correctly
+url_checker(urls)
 
 # If previously run, import contents of existing JSON file containing vacancies
 if os.path.exists('vacancies.json'):

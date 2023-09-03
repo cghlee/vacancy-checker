@@ -1,8 +1,8 @@
 #! python3
 # Dependencies - Requests, BeautifulSoup4
 
-# updater.py - Contains functions to check and update job vacancies, and
-# stores vacancies in a JSON file for use within vacancy_checker.py
+# functions_vacancies.py - Contains functions to check and update job vacancies,
+# and stores vacancies in a JSON file for use within vacancy_checker.py
 
 import requests, bs4, json
 
@@ -23,19 +23,8 @@ def update_civil_service(urls: dict):
     results_element = initial_soup.find('div', 'csr-page-title').getText()
     total_results = results_element.split()[0]
 
-    # Calculate expected number of pages of results (25 per page)
-    # If URL is invalid, raised ValueError will ask for new URLterminate the program
-    try:
-        expected_pages = int(total_results) // 25
-    except ValueError:
-        new_url = input('Invalid/expired URL - please input an updated URL:\n')
-        urls['civil_service'] = new_url
-        with open('urls.json', 'w') as file:
-            json_urls = json.dumps(urls)
-            file.write(json_urls)
-            file.close()
-        print('Civil Service Jobs URL updated\nPlease run again for updates')
-        quit()
+    # Calculate expected number of pages for all job vacancies
+    expected_pages = int(total_results) // 25
 
     # Grab HTML elements for the paging menu
     paging_element = initial_soup.select('div[class="search-results-paging-menu"]')
@@ -59,7 +48,8 @@ def update_civil_service(urls: dict):
             response_page = requests.get(page)
             response_page.raise_for_status()
         except requests.exceptions.HTTPError as err:
-            print('Error: %s' % str(err))
+            print('Error: %s, on page %s of %s'
+                  % (str(err), page_number, expected_pages + 1))
             quit()
         response_soup = bs4.BeautifulSoup(response_page.text, 'html.parser')
         page_results = response_soup.find_all('li', 'search-results-job-box')
