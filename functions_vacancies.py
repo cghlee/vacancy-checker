@@ -24,7 +24,10 @@ def update_civil_service(urls: dict):
     total_results = results_element.split()[0]
 
     # Calculate expected number of pages for all job vacancies
-    expected_pages = int(total_results) // 25
+    if int(total_results) % 25 == 0:
+        expected_pages = (int(total_results) // 25)
+    else:
+        expected_pages = (int(total_results) // 25) + 1
 
     # Grab HTML elements for the paging menu
     paging_element = initial_soup.select('div[class="search-results-paging-menu"]')
