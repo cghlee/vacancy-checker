@@ -33,7 +33,7 @@ def update_civil_service(urls: dict):
     # Add results pages into a list for processing of individual vacancies
     pages = []
     pages.append(url_civil)
-    for i in range(expected_pages):
+    for i in range(expected_pages - 1):
         pages.append(page_elements[i].get('href'))
 
     # Set up counters and initialise dictionary to store current job vacancies
@@ -43,13 +43,13 @@ def update_civil_service(urls: dict):
 
     # Find all job vacancies on each page
     for page in pages:
-        print('Processing page %s of %s' % (page_number, expected_pages + 1))
+        print('Processing page %s of %s' % (page_number, expected_pages))
         try:
             response_page = requests.get(page)
             response_page.raise_for_status()
         except requests.exceptions.HTTPError as err:
             print('Error: %s, on page %s of %s'
-                  % (str(err), page_number, expected_pages + 1))
+                  % (str(err), page_number, expected_pages))
             quit()
         response_soup = bs4.BeautifulSoup(response_page.text, 'html.parser')
         page_results = response_soup.find_all('li', 'search-results-job-box')
