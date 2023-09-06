@@ -4,33 +4,28 @@
 # functions_vacancies.py - Contains functions to check and update job vacancies,
 # and stores vacancies in a JSON file for use within vacancy_checker.py
 
+from functions_general import create_bs4_object
 import requests, bs4, json
 
+# Updates Civil Service Jobs vacancy listings
 def update_civil_service(urls: dict):
-    # Pulls a Civil Service jobs URL and converts into a BS4 object
+    # Pulls Civil Service Jobs URL from "urls.json" and creates BS4 object
     url_civil = urls['civil_service']
-    try:
-        initial_page = requests.get(url_civil)
-        initial_page.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        print('Error: %s' % str(err))
-        quit()
-
-    initial_soup = bs4.BeautifulSoup(initial_page.text, 'html.parser')
+    soup_object = create_bs4_object(url_civil)
     print('Updating Civil Service job vacancies')
 
     # Assign variable with total results
-    results_element = initial_soup.find('div', 'csr-page-title').getText()
-    total_results = results_element.split()[0]
+    results_element = soup_object.find('div', 'csr-page-title').getText()
+    total_results = int(results_element.split()[0])
 
     # Calculate expected number of pages for all job vacancies
-    if int(total_results) % 25 == 0:
-        expected_pages = (int(total_results) // 25)
+    if total_results % 25 == 0:
+        expected_pages = total_results // 25
     else:
-        expected_pages = (int(total_results) // 25) + 1
+        expected_pages = ((total_results) // 25) + 1
 
     # Grab HTML elements for the paging menu
-    paging_element = initial_soup.select('div[class="search-results-paging-menu"]')
+    paging_element = soup_object.select('div[class="search-results-paging-menu"]')
     page_elements = paging_element[0].find_all('a')
 
     # Add results pages into a list for processing of individual vacancies
@@ -71,8 +66,76 @@ def update_civil_service(urls: dict):
     print('Processing complete')
 
     # Write all vacancy information to a local JSON file
-    print('Writing job vacancies to vacancies.json')
-    with open('vacancies.json', 'w') as file:
+    print('Writing job vacancies to "vacancies_civil.json"')
+    with open('vacancies_civil.json', 'w') as file:
         file.write(json.dumps(vacancies))
         file.close()
     print('Writing complete')
+
+# Updates DWP vacancy listings
+def update_dwp(urls: dict):
+    # Pulls DWP URL from "urls.json" and creates BS4 object
+    url_dwp = urls['dwp']
+    soup_object = create_bs4_object(url_dwp)
+    print('Updating DWP job vacancies')
+
+    # Assign variable with total results
+    results_element = soup_object.find(class_='govuk-heading-l').getText()
+    str_results = results_element.split()[0]
+    if ',' in str_results:
+        total_results = int(str_results.replace(',', ''))
+    else:
+        total_results = int(str_results)
+
+    # Calculate expected number of pages for all job vacancies
+    if total_results % 50 == 0:
+        expected_pages = total_results // 50
+    else:
+        expected_pages = ((total_results) // 50) + 1
+
+    # Add results pages into a list for processing of individual vacancies
+    pages = []
+    for i in range(expected_pages):
+        pages = []
+        for i in range(expected_pages):
+            page_url = url_dwp + f"&pp=50&p={i+1}"
+            pages.append(page_url)
+
+    # Set up counters and initialise dictionary to store current job vacancies
+    vacancies = {}
+    page_number = 1
+    vacancy_number = 1
+
+    # Find all job vacancies on each page
+    for page in pages:
+        print('Processing page %s of %s' % (page_number, expected_pages))
+        try:
+            response_page = requests.get(page)
+            response_page.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            print('Error: %s, on page %s of %s'
+                  % (str(err), page_number, expected_pages))
+            quit()
+        response_soup = bs4.BeautifulSoup(response_page.text, 'html.parser')
+        page_results = response_soup.find_all('div', class_='search-result')
+        # Create nested dictionaries containing details about each job vacancy
+        for result in page_results:
+            print('Processing vacancy %s of %s' % (vacancy_number, total_results))
+            vacancy = {}
+            vacancy = {}
+            vacancy['title'] = str(result.find('a', class_='govuk-link').getText()).strip()
+            list_data = result.find_all('li')
+            vacancy['dept'] = str(list_data[1].getText().strip())
+            vacancy['url'] = result.find('a', class_='govuk-link').get('href')
+            ref = result.get('data-aid')
+            vacancies[ref] = vacancy
+            vacancy_number += 1
+        page_number += 1
+    print('Completed processing of DWP vacancies')
+
+    # Write all vacancy information to a local JSON file
+    print('Writing job vacancies to "vacancies_dwp.json"')
+    with open('vacancies_dwp.json', 'w') as file:
+        file.write(json.dumps(vacancies))
+        file.close()
+    print('Completed writing of DWP vacancies to JSON file')

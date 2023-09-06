@@ -16,16 +16,17 @@ relevant documentation linked below:
 ## How to Use
 
 Run `vacancy_checker.py`, which will operate according to functions defined
-within `functions_urls.py` and `functions_vacancies.py`.
+within `functions_urls.py`, `functions_vacancies.py`, and
+`functions_general.py`.
 
-If locally-stored `vacancies.json` or `urls.json` files do not exist, they
-will be automatically generated using current vacancy listings, or user-
+If locally-stored `<website>_vacancies.json` or `urls.json` files do not exist,
+these will be automatically generated using current vacancy listings, or user-
 defined job vacancy website URLs, respectively.
 
-If `vacancies.json` *does* exist locally, job vacancies will be updated and
-compared against those active at the last time the Vacancy Checker was run.
-New vacancies, if present, will be listed alongside a prompt for them to all
-be opened within your default browser.
+If `<website>_vacancies.json` *does* exist locally, job vacancies will be
+updated and then compared against those active during the last time the Vacancy
+Checker was run. New vacancies, if present, will be listed alongside a prompt
+for them to opened in separate tabs within your default browser.
 
-If a job vacancy website URL is identified as invalid or expired, you will be
-prompted to update the URL.
+If a job vacancy website URL is missing, or identified as invalid or expired,
+you will be prompted to update the URL.
