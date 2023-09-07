@@ -1,3 +1,9 @@
+#! python3
+# Dependencies - Requests, BeautifulSoup4
+
+# functions_general.py - Contains functions used across different sections of
+# the Vacancy Checker program's overall functionality
+
 import requests, bs4
 
 # Pulls a website URL and returns its BS4 soup object

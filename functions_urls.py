@@ -1,11 +1,11 @@
 #! python3
 # Dependencies - Requests, BeautifulSoup4
 
-# url_functions.py - Contains functions relating to job vacancy URLs, for
+# functions_url.py - Contains functions relating to job vacancy URLs, for
 # overall functionality of vacancy_checker.py
 
 from functions_general import create_bs4_object
-import os, json, requests, bs4
+import os, json
 
 # Function to update the Civil Service Jobs website URL
 def url_civil_updater(urls):
@@ -14,10 +14,16 @@ def url_civil_updater(urls):
     urls['civil_service'] = url_civil
     return urls
 
-# Function to update the Civil Service Jobs website URL
+# Function to update website URL for DWP job vacancies
 def url_dwp_updater(urls):
     url_dwp = input('Please input new URL for DWP vacancies: (optional)\n')
-    urls['dwp'] = url_dwp
+    # Removes unnecessary URL query data from a specified URL
+    url_edit = url_dwp.split('&')
+    for segment in url_edit:
+        if segment.startswith('p=') or segment.startswith('pp='):
+            url_edit.remove(segment)
+    url_new = '&'.join(url_edit)
+    urls['dwp'] = url_new
     return urls
 
 # Function to write updated URLs to JSON file
