@@ -6,7 +6,7 @@
 
 from functions_vacancies import update_civil_service, update_dwp
 from functions_urls import url_importer, url_checker
-import os, json, webbrowser
+import os, json, webbrowser, time
 
 # Import or generate job vacancy URLs via url_importer function
 urls = url_importer()
@@ -103,5 +103,10 @@ if urls['dwp']:
             # Open new vacancies in browser if desired
             is_to_open = input('Open new vacancies in browser? (y/n)\n').lower()
             if is_to_open == 'y':
+                counter_open = 0
                 for url in new_urls:
                     webbrowser.open(url)
+                    counter_open += 1
+                    # Pause for one second for every ten vacancy URLs opened
+                    if counter_open % 10 == 0:
+                        time.sleep(1)
