@@ -122,7 +122,6 @@ def update_dwp(urls: dict):
         for result in page_results:
             print('Processing vacancy %s of %s' % (vacancy_number, total_results))
             vacancy = {}
-            vacancy = {}
             vacancy['title'] = str(result.find('a', class_='govuk-link').getText()).strip()
             list_data = result.find_all('li')
             vacancy['dept'] = str(list_data[1].getText().strip())

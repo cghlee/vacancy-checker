@@ -15,4 +15,5 @@ def create_bs4_object(url):
         print('Error: %s' % str(err))
         quit()
     soup_object = bs4.BeautifulSoup(page.text, 'html.parser')
+    
     return soup_object

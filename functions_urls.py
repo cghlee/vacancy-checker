@@ -12,6 +12,7 @@ def url_civil_updater(urls):
     url_civil = input('Please input new URL for Civil Service Jobs vacancies: '
                       '(optional)\n')
     urls['civil_service'] = url_civil
+    
     return urls
 
 # Function to update website URL for DWP job vacancies
@@ -24,6 +25,7 @@ def url_dwp_updater(urls):
             url_edit.remove(segment)
     url_new = '&'.join(url_edit)
     urls['dwp'] = url_new
+
     return urls
 
 # Function to write updated URLs to JSON file
@@ -47,6 +49,7 @@ def url_importer():
         urls = url_civil_updater(urls)
         urls = url_dwp_updater(urls)
         url_json_writer(urls)
+
     return urls
 
 # Function to check the Civil Service Jobs URL
@@ -69,6 +72,7 @@ def url_civil_checker(urls):
         url_civil_updater(urls)
         print('URL for the Civil Service Jobs website updated')
         url_json_writer(urls)
+
     return urls
 
 # Function to check the Civil Service Jobs URL
@@ -91,6 +95,7 @@ def url_dwp_checker(urls):
         url_dwp_updater(urls)
         print('URL for the DWP vacancies website updated')
         url_json_writer(urls)
+
     return urls
 
 # Function to check functionality of all job vacancy website URLs
