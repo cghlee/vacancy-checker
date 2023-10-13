@@ -4,11 +4,11 @@
 # functions_url.py - Contains functions relating to job vacancy URLs, for
 # overall functionality of vacancy_checker.py
 
-from functions_general import create_bs4_object
+import functions_general as fg
 import os, json
 
 # Function to update the Civil Service Jobs website URL
-def url_civil_updater(urls):
+def update_url_civil(urls):
     url_civil = input('Please input new URL for Civil Service Jobs vacancies: '
                       '(optional)\n')
     urls['civil_service'] = url_civil
@@ -16,9 +16,9 @@ def url_civil_updater(urls):
     return urls
 
 # Function to update website URL for DWP job vacancies
-def url_dwp_updater(urls):
+def update_url_dwp(urls):
     url_dwp = input('Please input new URL for DWP vacancies: (optional)\n')
-    # Removes unnecessary URL query data from a specified URL
+    # Removes unnecessary URL query data from specified URL
     url_edit = url_dwp.split('&')
     for segment in url_edit:
         if segment.startswith('p=') or segment.startswith('pp='):
@@ -29,14 +29,14 @@ def url_dwp_updater(urls):
     return urls
 
 # Function to write updated URLs to JSON file
-def url_json_writer(urls):
+def write_json_url(urls):
     with open('urls.json', 'w') as file:
         json_urls = json.dumps(urls)
         file.write(json_urls)
         file.close()
 
 # Function to import or generate a JSON file with job vacancy website URLs
-def url_importer():
+def import_urls():
     # If previously run, import contents of existing JSON file containing URLs
     if os.path.exists('urls.json'):
         with open('urls.json', 'r') as file:
@@ -46,17 +46,17 @@ def url_importer():
     else:
         urls = {'civil_service': '',
                 'dwp': ''}
-        urls = url_civil_updater(urls)
-        urls = url_dwp_updater(urls)
-        url_json_writer(urls)
+        urls = update_url_civil(urls)
+        urls = update_url_dwp(urls)
+        write_json_url(urls)
 
     return urls
 
 # Function to check the Civil Service Jobs URL
-def url_civil_checker(urls):
+def check_url_civil(urls):
     # Initialise BS4 object for Civil Services Jobs vacancy page
     url_civil = urls['civil_service']
-    soup_page = create_bs4_object(url_civil)
+    soup_page = fg.create_bs4(url_civil)
 
     # Test for page content and update if required
     results_element = soup_page.find('div', 'csr-page-title').getText()
@@ -69,17 +69,17 @@ def url_civil_checker(urls):
             total_results = int(str_results)
         total_results // 25
     except ValueError:
-        url_civil_updater(urls)
-        print('URL for the Civil Service Jobs website updated')
-        url_json_writer(urls)
+        update_url_civil(urls)
+        print('URL for the Civil Service Jobs website updated\n')
+        write_json_url(urls)
 
     return urls
 
 # Function to check the Civil Service Jobs URL
-def url_dwp_checker(urls):
+def check_url_dwp(urls):
     # Initialise BS4 object for DWP vacancy page
     url_dwp = urls['dwp']
-    soup_page = create_bs4_object(url_dwp)
+    soup_page = fg.create_bs4(url_dwp)
 
     # Test for page content and update if required
     results_element = soup_page.find(class_='govuk-heading-l').getText()
@@ -92,25 +92,25 @@ def url_dwp_checker(urls):
             total_results = int(str_results)
         total_results // 25
     except ValueError:
-        url_dwp_updater(urls)
-        print('URL for the DWP vacancies website updated')
-        url_json_writer(urls)
+        update_url_dwp(urls)
+        print('URL for the DWP vacancies website updated\n')
+        write_json_url(urls)
 
     return urls
 
 # Function to check functionality of all job vacancy website URLs
-def url_checker(urls: dict):
+def check_urls(urls: dict):
     for key, value in urls.items():
         if value:
             if key == 'civil_service':
-                urls = url_civil_checker(urls)
+                urls = check_url_civil(urls)
             if key == 'dwp':
-                urls = url_dwp_checker(urls)
+                urls = check_url_dwp(urls)
         else:
             if key == 'civil_service':
-                urls = url_civil_updater(urls)
+                urls = update_url_civil(urls)
             if key == 'dwp':
-                urls = url_dwp_updater(urls)
+                urls = update_url_dwp(urls)
     if not urls['civil_service'] and not urls['dwp']:
-        print('No job vacancy URLs have been provided\nPlease rerun program'
-              'and provide URLs when prompted')
+        print('No job vacancy URLs have been provided\n'
+              'Please rerun program and provide URLs when prompted')

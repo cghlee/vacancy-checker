@@ -7,7 +7,7 @@
 import requests, bs4
 
 # Pulls a website URL and returns its BS4 soup object
-def create_bs4_object(url):
+def create_bs4(url):
     try:
         page = requests.get(url)
         page.raise_for_status()

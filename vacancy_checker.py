@@ -4,109 +4,61 @@
 # vacancy_checker.py - Checks existing vacancies, updates and compares against
 # new vacancies, then provides option to open new vacancies within a browser
 
-from functions_vacancies import update_civil_service, update_dwp
-from functions_urls import url_importer, url_checker
-import os, json, webbrowser, time
+import functions_vacancies as fv
+import functions_urls as fu
+import os, json
 
 # Import or generate job vacancy URLs via url_importer function
-urls = url_importer()
+urls = fu.import_urls()
 
 # Check job vacancy URLs are functioning correctly
-url_checker(urls)
+fu.check_urls(urls)
 
 if urls['civil_service']:
     # If previously run, import contents of existing JSON file containing vacancies
     if os.path.exists('vacancies_civil.json'):
         with open('vacancies_civil.json', 'r') as file:
-            old_vacancies = json.load(file)
+            old_civil = json.load(file)
             file.close()
-        created_civil_json = False
+        created_json_civil = False
     # If not previously run, generate a JSON file containing current vacancies
     else:
-        print('JSON file of job vacancies not found')
+        print('\nJSON file of job vacancies not found')
         print('Generating new JSON file containing current job vacancies')
-        update_civil_service(urls)
-        print('Generated new JSON file\nPlease run again for updates to vacancies')
-        created_civil_json = True
+        fv.update_vacancies_civil(urls)
+        print('Generated new JSON file\nPlease run again for updates to vacancies\n')
+        created_json_civil = True
 
-    if not created_civil_json:
+    if not created_json_civil:
         # Update vacancies and create dictionary to store updated vacancy information
-        update_civil_service(urls)
+        fv.update_vacancies_civil(urls)
         with open('vacancies_civil.json', 'r') as file:
-            updated_vacancies = json.load(file)
+            updated_civil = json.load(file)
             file.close()
 
-        # Identify and store new vacancies within a list
-        new_vacancies = []
-        for key in updated_vacancies:
-            if key not in old_vacancies:
-                new_vacancies.append(key)
-
-        # Feedback and break out of file if no new vacancies have been identified
-        if not new_vacancies:
-            print('There have been no new vacancies since last time')
-        else:
-            # Print data and store URLs relating to new vacancies
-            new_urls = []
-            print('New DWP vacancies found:')
-            for vacancy in new_vacancies:
-                print(' - %s, at %s' % (updated_vacancies[vacancy]['title'],\
-                                        updated_vacancies[vacancy]['dept']))
-                new_urls.append(updated_vacancies[vacancy]['url'])
-
-            # Open new vacancies in browser if desired
-            is_to_open = input('Open new vacancies in browser? (y/n)\n').lower()
-            if is_to_open == 'y':
-                for url in new_urls:
-                    webbrowser.open(url)
+        # Print information about and prompt to open new vacancies in a web browser
+        fv.print_new_vacancies(updated_civil, old_civil)
 
 if urls['dwp']:
     if os.path.exists('vacancies_dwp.json'):
         with open('vacancies_dwp.json', 'r') as file:
-            old_vacancies = json.load(file)
+            old_dwp = json.load(file)
             file.close()
-        created_dwp_json = False
+        created_json_dwp = False
     # If not previously run, generate a JSON file containing current vacancies
     else:
-        print('JSON file of job vacancies not found')
+        print('\nJSON file of job vacancies not found')
         print('Generating new JSON file containing current job vacancies')
-        update_dwp(urls)
-        print('Generated new JSON file\nPlease run again for updates to vacancies')
-        created_dwp_json = True
+        fv.update_vacancies_dwp(urls)
+        print('Generated new JSON file\nPlease run again for updates to vacancies\n')
+        created_json_dwp = True
 
-    if not created_dwp_json:
+    if not created_json_dwp:
         # Update vacancies and create dictionary to store updated vacancy information
-        update_dwp(urls)
+        fv.update_vacancies_dwp(urls)
         with open('vacancies_dwp.json', 'r') as file:
-            updated_vacancies = json.load(file)
+            updated_dwp = json.load(file)
             file.close()
 
-        # Identify and store new vacancies within a list
-        new_vacancies = []
-        for key in updated_vacancies:
-            if key not in old_vacancies:
-                new_vacancies.append(key)
-
-        # Feedback and break out of file if no new vacancies have been identified
-        if not new_vacancies:
-            print('There have been no new vacancies since last time')
-            quit()
-        else:
-            # Print data and store URLs relating to new vacancies
-            new_urls = []
-            print('New vacancies found:')
-            for vacancy in new_vacancies:
-                print(' - %s, at %s' % (updated_vacancies[vacancy]['title'],\
-                                        updated_vacancies[vacancy]['dept']))
-                new_urls.append(updated_vacancies[vacancy]['url'])
-
-            # Open new vacancies in browser if desired
-            is_to_open = input('Open new vacancies in browser? (y/n)\n').lower()
-            if is_to_open == 'y':
-                counter_open = 0
-                for url in new_urls:
-                    webbrowser.open(url)
-                    counter_open += 1
-                    # Pause for one second for every ten vacancy URLs opened
-                    if counter_open % 10 == 0:
-                        time.sleep(1)
+        # Print information about and prompt to open new vacancies in a web browser
+        fv.print_new_vacancies(updated_dwp, old_dwp)

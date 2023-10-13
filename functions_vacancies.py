@@ -4,15 +4,15 @@
 # functions_vacancies.py - Contains functions to check and update job vacancies,
 # and stores vacancies in a JSON file for use within vacancy_checker.py
 
-from functions_general import create_bs4_object
-import requests, bs4, json
+import functions_general as fg
+import json, webbrowser, time
 
 # Updates Civil Service Jobs vacancy listings
-def update_civil_service(urls: dict):
+def update_vacancies_civil(urls: dict):
     # Pulls Civil Service Jobs URL from "urls.json" and creates BS4 object
     url_civil = urls['civil_service']
-    soup_object = create_bs4_object(url_civil)
-    print('Updating Civil Service job vacancies')
+    soup_object = fg.create_bs4(url_civil)
+    print('Updating Civil Service job vacancies...')
 
     # Assign variable with total results
     results_element = soup_object.find('div', 'csr-page-title').getText()
@@ -41,19 +41,12 @@ def update_civil_service(urls: dict):
 
     # Find all job vacancies on each page
     for page in pages:
-        print('Processing page %s of %s' % (page_number, expected_pages))
-        try:
-            response_page = requests.get(page)
-            response_page.raise_for_status()
-        except requests.exceptions.HTTPError as err:
-            print('Error: %s, on page %s of %s'
-                  % (str(err), page_number, expected_pages))
-            quit()
-        response_soup = bs4.BeautifulSoup(response_page.text, 'html.parser')
+        print('Processing page %s of %s...' % (page_number, expected_pages))
+        response_soup = fg.create_bs4(page)
         page_results = response_soup.find_all('li', 'search-results-job-box')
         # Create nested dictionaries containing details about each job vacancy
         for result in page_results:
-            print('Processing vacancy %s of %s' % (vacancy_number, total_results))
+            print('Processing vacancy %s of %s...' % (vacancy_number, total_results))
             vacancy = {}
             vacancy['title'] = result.find('a').getText()
             vacancy['dept'] = result.find('div', 'search-results-job-box-department').getText()
@@ -63,21 +56,21 @@ def update_civil_service(urls: dict):
             vacancies[ref] = vacancy
             vacancy_number += 1
         page_number += 1
-    print('Processing complete')
+    print('Completed processing of Civil Service vacancies')
 
     # Write all vacancy information to a local JSON file
-    print('Writing job vacancies to "vacancies_civil.json"')
+    print('\nWriting job vacancies to "vacancies_civil.json"...')
     with open('vacancies_civil.json', 'w') as file:
         file.write(json.dumps(vacancies))
         file.close()
     print('Writing complete')
 
 # Updates DWP vacancy listings
-def update_dwp(urls: dict):
+def update_vacancies_dwp(urls: dict):
     # Pulls DWP URL from "urls.json" and creates BS4 object
     url_dwp = urls['dwp']
-    soup_object = create_bs4_object(url_dwp)
-    print('Updating DWP job vacancies')
+    soup_object = fg.create_bs4(url_dwp)
+    print('\nUpdating DWP job vacancies...')
 
     # Assign variable with total results
     results_element = soup_object.find(class_='govuk-heading-l').getText()
@@ -108,19 +101,12 @@ def update_dwp(urls: dict):
 
     # Find all job vacancies on each page
     for page in pages:
-        print('Processing page %s of %s' % (page_number, expected_pages))
-        try:
-            response_page = requests.get(page)
-            response_page.raise_for_status()
-        except requests.exceptions.HTTPError as err:
-            print('Error: %s, on page %s of %s'
-                  % (str(err), page_number, expected_pages))
-            quit()
-        response_soup = bs4.BeautifulSoup(response_page.text, 'html.parser')
+        print('Processing page %s of %s...' % (page_number, expected_pages))
+        response_soup = fg.create_bs4(page)
         page_results = response_soup.find_all('div', class_='search-result')
         # Create nested dictionaries containing details about each job vacancy
         for result in page_results:
-            print('Processing vacancy %s of %s' % (vacancy_number, total_results))
+            print('Processing vacancy %s of %s...' % (vacancy_number, total_results))
             vacancy = {}
             vacancy['title'] = str(result.find('a', class_='govuk-link').getText()).strip()
             list_data = result.find_all('li')
@@ -133,8 +119,40 @@ def update_dwp(urls: dict):
     print('Completed processing of DWP vacancies')
 
     # Write all vacancy information to a local JSON file
-    print('Writing job vacancies to "vacancies_dwp.json"')
+    print('\nWriting job vacancies to "vacancies_dwp.json"...')
     with open('vacancies_dwp.json', 'w') as file:
         file.write(json.dumps(vacancies))
         file.close()
     print('Completed writing of DWP vacancies to JSON file')
+
+# Prints information about and prompts to open new vacancies in a web browser
+def print_new_vacancies(updated_vacancies: dict, old_vacancies: dict):
+    # Identify and store new vacancies within a list
+    print('\nChecking for new vacancies...')
+    new_vacancies = []
+    for key in updated_vacancies:
+        if key not in old_vacancies:
+            new_vacancies.append(key)
+
+    # Feedback and break out of file if no new vacancies have been identified
+    if not new_vacancies:
+        print('There have been no new vacancies since last time')
+    else:
+        # Print data and store URLs relating to new vacancies
+        new_urls = []
+        print('New vacancies found:')
+        for vacancy in new_vacancies:
+            print(' - %s, at %s' % (updated_vacancies[vacancy]['title'],\
+                                    updated_vacancies[vacancy]['dept']))
+            new_urls.append(updated_vacancies[vacancy]['url'])
+
+        # Open new vacancies in browser if desired
+        is_to_open = input('Open new vacancies in browser? (y/n)\n').lower()
+        if is_to_open == 'y':
+            counter_open = 0
+            for url in new_urls:
+                webbrowser.open(url)
+                counter_open += 1
+                # Pause for one second for every ten vacancy URLs opened
+                if counter_open % 10 == 0:
+                    time.sleep(1)
