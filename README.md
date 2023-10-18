@@ -1,9 +1,10 @@
 # Vacancy Checker
 
-An automated solution to filter through new job vacancies relevant to me,
-without having to reparse all 50+ vacancies daily while trying to remember
-those I had or had not seen. Originally designed for the UK Government's
-Civil Service Jobs website.
+An automated solution to filter through new and relevant job vacancies without
+manually reparsing every job vacancy daily while attempting to remember those
+that have or have not yet been seen. Originally designed for the UK Government
+"Civil Service Jobs" website, but expanded for compatibility with the
+Department for Work and Pension's "Find a Job" website.
 
 ## Dependencies
 
