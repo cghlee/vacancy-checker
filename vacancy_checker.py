@@ -62,3 +62,5 @@ if urls['dwp']:
 
         # Print information about and prompt to open new vacancies in a web browser
         fv.print_new_vacancies(updated_dwp, old_dwp)
+
+print('\nVacancy checker execution complete')

@@ -156,5 +156,3 @@ def print_new_vacancies(updated_vacancies: dict, old_vacancies: dict):
                 # Pause for one second for every ten vacancy URLs opened
                 if counter_open % 10 == 0:
                     time.sleep(1)
-            
-            print('\nAll vacancies have been opened.')
