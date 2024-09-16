@@ -4,7 +4,8 @@
 # functions_general.py - Contains functions used across different sections of
 # the Vacancy Checker program's overall functionality
 
-import requests, bs4
+from bs4 import BeautifulSoup
+import requests
 
 # Pulls a website URL and returns its BS4 soup object
 def create_bs4(url):
@@ -14,6 +15,6 @@ def create_bs4(url):
     except requests.exceptions.HTTPError as err:
         print('Error: %s' % str(err))
         quit()
-    soup_object = bs4.BeautifulSoup(page.text, 'html.parser')
+    soup_object = BeautifulSoup(page.text, 'html.parser')
     
     return soup_object

@@ -1,0 +1,6 @@
+__pycache__
+.venv
+
+urls.json
+vacancies_civil.json
+vacancies_dwp.json
