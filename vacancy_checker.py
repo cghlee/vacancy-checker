@@ -4,9 +4,10 @@
 # vacancy_checker.py - Checks existing vacancies, updates and compares against
 # new vacancies, then provides option to open new vacancies within a browser
 
-import functions_vacancies as fv
-import functions_urls as fu
 import os, json
+
+from src import functions_vacancies as fv
+from src import functions_urls as fu
 
 # Import or generate job vacancy URLs via url_importer function
 urls = fu.import_urls()
