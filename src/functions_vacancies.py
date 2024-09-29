@@ -4,7 +4,7 @@
 # functions_vacancies.py - Contains functions to check and update job vacancies,
 # and stores vacancies in a JSON file for use within vacancy_checker.py
 
-import functions_general as fg
+from . import functions_general as fg
 import json, webbrowser, time
 
 # Updates Civil Service Jobs vacancy listings

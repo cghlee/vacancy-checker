@@ -4,7 +4,7 @@
 # functions_url.py - Contains functions relating to job vacancy URLs, for
 # overall functionality of vacancy_checker.py
 
-import functions_general as fg
+from . import functions_general as fg
 import os, json
 
 # Function to update the Civil Service Jobs website URL
