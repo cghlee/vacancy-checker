@@ -70,7 +70,7 @@ def check_url_civil(urls):
         total_results // 25
     except ValueError:
         update_url_civil(urls)
-        print('URL for the Civil Service Jobs website updated\n')
+        print('\nURL for the Civil Service Jobs website updated\n')
         write_json_url(urls)
 
     return urls
@@ -93,7 +93,7 @@ def check_url_dwp(urls):
         total_results // 25
     except ValueError:
         update_url_dwp(urls)
-        print('URL for the DWP vacancies website updated\n')
+        print('\nURL for the DWP vacancies website updated\n')
         write_json_url(urls)
 
     return urls
