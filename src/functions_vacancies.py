@@ -128,7 +128,7 @@ def update_vacancies_dwp(urls: dict):
 # Prints information about and prompts to open new vacancies in a web browser
 def print_new_vacancies(updated_vacancies: dict, old_vacancies: dict):
     # Identify and store new vacancies within a list
-    print('\nChecking for new vacancies...')
+    print('\nChecking for new vacancies...\n')
     new_vacancies = []
     for key in updated_vacancies:
         if key not in old_vacancies:
